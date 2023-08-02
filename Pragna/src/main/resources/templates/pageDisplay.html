@@ -1,0 +1,148 @@
+<html lang="en">
+  <head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/sample.css" />
+    <link rel="stylesheet" href="/manage-audio.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.min.css"> 
+    <title>Text to Speech</title>
+  </head>
+  <body class="container mt-5 bg-dark">
+	<div class="row">
+	<div class="col-sm-6">
+    <image width="100%" height="500px" id="image_id"></image>
+	</div>
+	<div class="col-sm-6">
+	
+    <!-- Text Area  for the User to Type -->
+    <textarea class="form-control bg-dark text-light" cols="30" rows="10" id="text_id"></textarea>
+
+    <p class="label text-light mt-4">Select Voice</p>
+    
+    <!-- Select Menu for Voice -->
+    <select id="voices" class="form-select bg-secondary text-light"></select>
+
+    <!-- Range Slliders for Volume, Rate & Pitch -->
+    <div class="d-flex mt-4 text-light">
+      <div class="mx-3">
+        <p class="label">Volume</p>
+        <input type="range" min="0" max="1" value="1" step="0.1" id="volume" />
+        <span id="volume-label" class="ms-2">1</span>
+      </div>
+      <div class="mx-3">
+        <p class="label">Rate</p>
+        <input type="range" min="0.1" max="10" value="1" id="rate" step="0.1" />
+        <span id="rate-label" class="ms-2">1</span>
+      </div>
+     
+	 <div class="mx-3"> 
+        <p class="label">Pitch</p>
+        <input type="range" min="0" max="2" value="1" step="0.1" id="pitch" />
+        <span id="pitch-label" class="ms-2">1</span>
+      </div>
+    </div>
+	
+    <!-- Control Buttons -->
+    <div class="mb-5">
+	  <button id="previousId" onclick="previous()" class="btn btn-primary mt-4"><i class="fas fa-chevron-left"></i></button>
+      <button id="start" class="btn btn-success hover-button mt-4" data-hover-text="Start"><i class="fas fa-play"></i></button>
+      <button id="pause" class="btn btn-warning hover-button mt-4" style="display: none;" data-hover-text="Pause"><i class="fas fa-pause"></i></button>
+      <button id="resume" class="btn btn-info hover-button mt-4" style="display: none;" data-hover-text="Resume"><i class="fas fa-play-circle"></i></button>
+      <!-- <button id="cancel" class="btn btn-danger hover-button mt-4 me-3" style="display: none;" data-hover-text="Stop"><i class="fas fa-stop"></i></button> -->
+	  <button id="recordButton" class="btn btn-danger hover-button mt-4 ms-3" data-hover-text="Start_Record"><i class="fas fa-microphone"></i></button>
+	  <button id="pauseButton" class="btn btn-danger hover-button mt-4 ms-3" style="display: none;"data-hover-text="Pause_Record"><i class="fas fa-pause"></i></button>
+	  <button id="stopButton" class="btn btn-danger hover-button mt-4 ms-3" style="display: none;" data-hover-text="Stop_Record"><i class="fas fa-stop"></i></button>
+	  <button id="nextId" onclick="next()" class="btn btn-primary mt-4" style="float: right;"><i class="fas fa-chevron-right"></i></button>
+    </div>
+	</div>
+	</div>
+	
+	<div class="playback">
+			<ol id="recordingsList"></ol>
+	</div>
+  </body>
+  
+<script src="/sample.js"></script>
+<script src="/recorder.js"></script>
+<script src="/app.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+var url = window.location.href;
+var path = new URL(url).pathname;
+var id=path.split("/")[2];
+var previous_id="";
+var next_id="";
+document.addEventListener('DOMContentLoaded', function()  {
+	
+	var formData = new FormData();
+	   formData.append("pageId", id);
+	   
+	   var xhr = new XMLHttpRequest();
+	   xhr.open("POST", "/page/getPageById");
+	   xhr.send(formData);
+	   xhr.addEventListener("readystatechange", function () {
+	   	  if (this.readyState === 4) {
+	   		 console.log(this.responseText);
+	   		var response = JSON.parse(this.responseText);
+	   		var pageId = response.pageId;
+	   		console.log(pageId);
+	   		document.getElementById("text_id").value=response.text;
+	   		document.getElementById("image_id").src=response.imageUrl;
+	   	  }
+	   	});
+	   
+	   var xhr1 = new XMLHttpRequest();
+	   xhr1.open("POST", "/page/getPreviousNextIds");
+	   xhr1.send(formData);
+	   xhr1.addEventListener("readystatechange", function () {
+	   	  if (this.readyState === 4) {
+	   		 console.log(this.responseText);
+	   		var response = JSON.parse(this.responseText);
+	   		previous_id = response.previuos;
+	   		next_id = response.next;
+	   		
+	   		if(response.previuos == null)
+			{
+	   			const button1 = document.getElementById('previousId');
+	   			 button1.disabled = true;
+			}
+	   		if(response.next == null)
+			{
+	   			const button2 = document.getElementById('nextId');
+	   			 button2.disabled = true;
+			}
+	   		}
+	   	});
+	   
+	   
+})
+
+function previous()
+{
+	if(previous_id>0)
+		{
+	window.open("/page/"+previous_id, "_self");
+		}
+		else{
+			Swal.fire({
+	   			  icon: 'error',
+	   			  title: 'Page Not Found..!',
+	   			 })
+		}
+}
+function next()
+{
+			if(next_id>0)
+	   			{
+	   			window.open("/page/"+next_id, "_self");
+	   			}
+	   		else{
+	   			Swal.fire({
+	   			  icon: 'error',
+	   			  title: 'Page Not Found..!',
+	   			 })
+	   		}
+}
+</script>
+</html>
