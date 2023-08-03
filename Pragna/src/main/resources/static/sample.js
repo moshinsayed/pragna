@@ -1,6 +1,5 @@
 let speech = new SpeechSynthesisUtterance();
 speech.onend = function() {
-  alert("Speech synthesis ended.");
   window.speechSynthesis.cancel();
   document.getElementById("pause").style.display = "none";
   document.getElementById("resume").style.display = "none";
