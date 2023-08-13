@@ -123,10 +123,13 @@ function stopRecording() {
 }
 
 function createDownloadLink(blob) {
-	
+	$("#recordingsList").empty();
 	var url = URL.createObjectURL(blob);
 	var au = document.createElement('audio');
 	var li = document.createElement('li');
+	
+	
+	
 	const button1 = document.createElement('button');
 	button1.classList.add('btn', 'btn-primary');
 	button1.style.marginBottom = '40px';
@@ -139,7 +142,30 @@ function createDownloadLink(blob) {
 	//add controls to the <audio> element
 	au.controls = true;
 	au.src = url;
-
+	
+	 let text = document.getElementById("text_id");
+  	let originalText = text.innerText;
+	au.addEventListener("canplaythrough", () => {
+		au.play();
+		
+		au.addEventListener("timeupdate", (event) => {
+			const currentTime = au.currentTime;
+    		const duration = au.duration;
+    
+    // Calculate the character index and length based on audio's current time and text's length
+    		const progressPercentage = (currentTime / duration) * 100;
+    		const textLength = originalText.length;
+    		const charIndex = Math.floor((progressPercentage / 100) * textLength);
+    		 const remainingText = originalText.substring(charIndex);
+    		 console.log(remainingText.length);
+    		const charLength = 10;
+		      text.innerHTML  = highlight1(
+		        originalText,
+		        charIndex,
+		        charIndex + charLength
+		      );
+    });
+	});
 	//save to disk link
 	link.href = url;
 	link.download = filename+".wav"; //download forces the browser to donwload the file using the  filename
@@ -155,6 +181,7 @@ function createDownloadLink(blob) {
 	//add the save to disk link to li
 	li.appendChild(link);
 	
+	
 	//upload link
 	const button = document.createElement('button');
 	button.classList.add('btn', 'btn-success');
@@ -162,15 +189,127 @@ function createDownloadLink(blob) {
 	var upload = document.createElement('a');
 	upload.href="#";
 	upload.addEventListener("click", function(event){
+		 $("#overlay").fadeIn();　
 		  var xhr=new XMLHttpRequest();
 		  xhr.onload=function(e) {
 		      if(this.readyState === 4) {
-		          console.log("Server returned: ",e.target.responseText);
+				var response = JSON.parse(this.responseText);
+		          console.log(response);
+		          
+		          	$('#rateit-demo').rateit({ 
+							min: 0, max: 5, step: 0.5, mode: 'bg', 
+							icon: '★', starwidth: 16, starheight: 16, 
+							readonly: false, resetable: true, ispreset: false
+	  					});
+	 				$('#rateit-demo').rateit('value', response.result);
+	 				
+	 				$("#overlay").fadeOut();
+	 				
+	 				
+	 				 var jsonData = response.output;
+	 				
+ var pronunciationChartCtx = document.getElementById('pronunciationChart').getContext('2d');
+  var fluencyRhythmChartCtx = document.getElementById('fluencyRhythmChart').getContext('2d');
+  
+  // Process jsonData and extract necessary data for charts
+  
+  // Example data for demonstration
+  var words = jsonData.words;
+	var pronunciationScores = words.map(function(word) {
+	return word.scores.pronunciation;
+	});
+  var fluency = jsonData.fluency;
+//var rhythm = jsonData.rhythm;
+var overall = jsonData.overall;
+var pronunciation=jsonData.pronunciation;
+
+var fluencyRhythmData = [overall, fluency, pronunciation ];
+  
+  // Create charts
+  new Chart(pronunciationChartCtx, {
+    type: 'bar',
+   data: {
+      labels: jsonData.words.map(function(word) {
+        return word.word;
+      }),
+      datasets: [{
+        label: 'Pronunciation Score',
+        data: pronunciationScores,
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100
+        }
+      }
+    }
+  });
+  
+  new Chart(fluencyRhythmChartCtx, {
+    type: 'polarArea',
+    data: {
+      labels: ['Overall', 'Fluency', 'Pronunciation' ],
+      datasets: [{
+        data: fluencyRhythmData,
+        backgroundColor: ['rgb(51, 153, 51)', 'rgba(75, 192, 192, 0.5)', 'rgba(255, 99, 132, 0.5)']
+      }]
+    }
+  });
+  
+  var words = jsonData.words;
+
+  // Create Word Pronunciation Charts
+  var wordChartsDiv = document.getElementById("wordCharts");
+  jsonData.words.forEach(function(word) {
+    var wordChartCanvas = document.createElement("canvas");
+    wordChartCanvas.className = "my-4";
+	wordChartCanvas.setAttribute("width", "546"); // Set canvas width
+    wordChartCanvas.setAttribute("height", "273"); // Set canvas height
+    wordChartsDiv.appendChild(wordChartCanvas);
+    
+	var phonemeLabels = word.phonics.map(function(phoneme) {
+      return phoneme.spell;
+    });
+
+    var phonemeScores = word.phonics.map(function(phoneme) {
+      return phoneme.overall;
+    });
+    
+	var wordChartCtx = wordChartCanvas.getContext("2d");
+    var wordChart = new Chart(wordChartCtx, {
+      type: 'bar',
+      data: {
+        labels: phonemeLabels,
+        datasets: [{
+          label: 'Phoneme Score',
+          data: phonemeScores,
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  });
+	 				
+	 			$("#infoIcon").css("display", "contents");
+	 				
 		      }
 		  };
 		  var fd=new FormData();
 		 // alert($("#text_id").val());
-		  fd.append("text", $("#text_id").val());
+		  fd.append("text", $("#text_id").text());
 		  fd.append("file",blob, filename);
 		  xhr.open("POST", "/record/submit_audio");
 		  xhr.send(fd);
@@ -180,6 +319,55 @@ function createDownloadLink(blob) {
 	li.appendChild(document.createTextNode (" "))//add a space in between
 	li.appendChild(upload)//add the upload link to li
 
+	var divElement = document.createElement("div");
+	divElement.className = "rateit";
+	divElement.id = "rateit-demo";
+	divElement.setAttribute("data-rateit-mode", "font");
+	divElement.style.fontSize = "50px";
+	divElement.style.marginLeft = '25px';
+	
+	li.appendChild(divElement);
+	
+	var info = document.createElement("div");
+	info.className = "info-icon";
+	info.id = "infoIcon";
+	info.innerHTML = '<i class="fa fa-info-circle"></i>';
+	info.style.display="none";
+	
+	li.appendChild(info);
 	//add the li element to the ol
 	recordingsList.appendChild(li);
+	
+	//Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the icon, open the modal
+document.getElementById("infoIcon").addEventListener("click", function() {
+  modal.style.display = "block";
+});
+
+// When the user clicks on <span> (x), close the modal
+span.addEventListener("click", function() {
+  modal.style.display = "none";
+});
+
+// When the user clicks anywhere outside of the modal, close it
+window.addEventListener("click", function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+});
 }
+
+
+const highlight1 = (text, from, to) => {
+	console.log(text);
+  let replacement = highlightBackground1(text.slice(from, to));
+  console.log(replacement);
+  return text.substring(0, from) + replacement + text.substring(to);
+};
+const highlightBackground1 = (sample) =>
+  `<span  style="background-color:blue;">${sample}</span>`;

@@ -1,6 +1,8 @@
 let speech = new SpeechSynthesisUtterance();
 speech.onend = function() {
   window.speechSynthesis.cancel();
+   let originalText = document.getElementById("text_id").innerText;
+  document.getElementById("text_id").innerHTML=originalText;
   document.getElementById("pause").style.display = "none";
   document.getElementById("resume").style.display = "none";
   document.getElementById("start").style.display = "inline-block";
@@ -66,8 +68,19 @@ document.querySelector("#voices").addEventListener("change", () => {
 
 document.querySelector("#start").addEventListener("click", () => {
   // Set the text property with the value of the textarea
-  speech.text = document.querySelector("textarea").value;
-
+ // speech.text = document.querySelector("textarea").value;
+  let text = document.getElementById("text_id");
+  let originalText = text.innerText;
+  speech.text=originalText;
+  speech.addEventListener("boundary", (event) => {
+      const { charIndex, charLength } = event;
+      console.log(charIndex+'---'+charLength);
+      text.innerHTML  = highlight(
+		originalText,
+        charIndex,
+        charIndex + charLength
+      );
+    });
   // Start Speaking
   window.speechSynthesis.speak(speech);
   document.getElementById("start").style.display = "none";
@@ -88,4 +101,9 @@ document.querySelector("#resume").addEventListener("click", () => {
   document.getElementById("pause").style.display = "inline-block";
 });
 
-
+const highlight = (text, from, to) => {
+  let replacement = highlightBackground(text.slice(from, to));
+  return text.substring(0, from) + replacement + text.substring(to);
+};
+const highlightBackground = (sample) =>
+  `<span  style="background-color:blue;">${sample}</span>`;
