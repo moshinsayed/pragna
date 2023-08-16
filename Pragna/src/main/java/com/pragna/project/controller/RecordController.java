@@ -27,31 +27,30 @@ import com.pragna.project.service.RecordService;
 @RestController
 @RequestMapping("/record")
 public class RecordController {
-	
+
 	@Autowired
 	RecordService recordService;
 
 	@PostMapping("/submit_audio")
-	public ResponseEntity<?> submitAudio(@RequestParam MultipartFile file, @RequestParam("text") String text)
-	{
-		Map<String, Object> result=new HashMap<String, Object>();
-		String output=recordService.submitAudio(file, text);
+	public ResponseEntity<?> submitAudio(@RequestParam MultipartFile file, @RequestParam("text") String text) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		String output = recordService.submitAudio(file, text);
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-		    SpeechSuperResult jsonObject = objectMapper.readValue(output, SpeechSuperResult.class);
+			SpeechSuperResult jsonObject = objectMapper.readValue(output, SpeechSuperResult.class);
 
-		     result.put("output", jsonObject.getResult());
-		    double aa=(double) jsonObject.getResult().getOverall()/20;
-		    System.out.println(aa);
-		    double score=Math.round(aa * 2 / 2.0);
-		    
-		    result.put("result", score);
+			result.put("output", jsonObject.getResult());
+			double aa = (double) jsonObject.getResult().getOverall() / 20;
+			System.out.println(aa);
+			double score = Math.round(aa * 2 / 2.0);
+
+			result.put("result", score);
 		} catch (Exception e) {
-		    e.printStackTrace();
+			e.printStackTrace();
 		}
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/audioURL/{fileId}")
 	public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
 		// Load file from database

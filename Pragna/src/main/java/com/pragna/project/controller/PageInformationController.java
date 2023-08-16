@@ -30,38 +30,38 @@ public class PageInformationController {
 
 	@Autowired
 	PageInformationService pageService;
-	
+
 	@PostMapping("/add_new")
-	public ResponseEntity<?> addPageInfo(@RequestParam(required = false)  MultipartFile file, @RequestParam("pageName") String pageName, @RequestParam("sourceReference") String sourceReference, @RequestParam("imageUrl") String imageUrl, @RequestParam("text") String text, @RequestParam("source") String source)
-	{
+	public ResponseEntity<?> addPageInfo(@RequestParam(required = false) MultipartFile file,
+			@RequestParam("pageName") String pageName, @RequestParam("sourceReference") String sourceReference,
+			@RequestParam("imageUrl") String imageUrl, @RequestParam("text") String text,
+			@RequestParam("source") String source) {
 		Long result = null;
 		try {
-		 result=pageService.addPageInformation(file,pageName,sourceReference,imageUrl,text,source);
+			result = pageService.addPageInformation(file, pageName, sourceReference, imageUrl, text, source);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/getPageById")
-	public ResponseEntity<?> getPageById(@RequestParam("pageId") Long id)
-	{
-		PageModel result=pageService.getPageById(id);
+	public ResponseEntity<?> getPageById(@RequestParam("pageId") Long id) {
+		PageModel result = pageService.getPageById(id);
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/getPreviousNextIds")
-	public ResponseEntity<?> getPreviousNextIds(@RequestParam("pageId") Long id)
-	{
-		Long previousId=pageService.getPreviousEntity(id);
-		Long nextId=pageService.getNextEntity(id);
-		Map<String, Long> result=new HashMap<String, Long>();
+	public ResponseEntity<?> getPreviousNextIds(@RequestParam("pageId") Long id) {
+		Long previousId = pageService.getPreviousEntity(id);
+		Long nextId = pageService.getNextEntity(id);
+		Map<String, Long> result = new HashMap<String, Long>();
 		result.put("previuos", previousId);
 		result.put("next", nextId);
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/imageURL/{fileId}")
 	public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
 		// Load file from database
