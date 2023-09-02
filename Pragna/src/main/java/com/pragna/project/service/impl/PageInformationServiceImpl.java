@@ -23,19 +23,24 @@ public class PageInformationServiceImpl implements PageInformationService {
 	PageRepository pageRepo;
 
 	@Override
-	public Long addPageInformation(MultipartFile file, String pageName, String sourceReference, String imageUrl,
-			String text, String source) throws IOException {
+	public Long addPageInformation(MultipartFile file, Long id, String sourceReference, String text, String source) throws IOException {
 
-		Page data = new Page();
-		if (imageUrl.isEmpty()) {
+		Page data = null;
+		if(pageRepo.findById(id).isPresent())
+		{
+			data=pageRepo.findById(id).get();
+		}
+		else {
+			data=new Page();
+			}
+		if(file != null)
+		{
 			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 			data.setFileName(fileName);
 			data.setFileType(file.getContentType());
 			data.setImage(file.getBytes());
 		}
 
-		data.setImageUrl(imageUrl);
-		data.setPageName(pageName);
 		data.setSource(source);
 		data.setSourceReference(sourceReference);
 		data.setText(text);
@@ -47,13 +52,9 @@ public class PageInformationServiceImpl implements PageInformationService {
 
 		PageModel output = new PageModel();
 		output.setPageId(saved_data.getId());
-		output.setPageName(saved_data.getPageName());
+		output.setPageName(saved_data.getName());
 		output.setText(saved_data.getText());
-		if (imageUrl.isEmpty()) {
-			output.setImageUrl(fileDownloadUri);
-		} else {
-			output.setImageUrl(imageUrl);
-		}
+		output.setImageUrl(fileDownloadUri);
 		return saved_data.getId();
 	}
 
@@ -68,14 +69,10 @@ public class PageInformationServiceImpl implements PageInformationService {
 					.path(dbFile1.get().getId().toString()).toUriString();
 
 			output.setPageId(saved_data.getId());
-			output.setPageName(saved_data.getPageName());
+			output.setPageName(saved_data.getName());
 			output.setText(saved_data.getText());
-			if (saved_data.getImageUrl().isEmpty()) {
 				output.setImageUrl(fileDownloadUri);
 			} else {
-				output.setImageUrl(saved_data.getImageUrl());
-			}
-		} else {
 			output.setPageId(0L);
 		}
 		return output;

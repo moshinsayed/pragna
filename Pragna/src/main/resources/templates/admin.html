@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+    <title>Pragna Kids</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<!-- Include font-awesome here, CDN is ok, or locally installed by bower to your project -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://dev.zevoirtechnologies.com:8443/pragna_dev/zTreeStyle/zTreeStyle.css" type="text/css">
+  <link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+	<style>
+    body {
+      background-color: white;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    div, p, table, th, td {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      font-size: 12px;
+      font-family: dotum, Verdana, Arial, Helvetica, AppleGothic, sans-serif;
+    }
+
+    #testIframe {
+      margin-left: 2px;
+    }
+  </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="https://dev.zevoirtechnologies.com:8443/pragna_dev/zTree_JS/jquery.ztree.core.js"></script>
+    <script type="text/javascript" src="https://dev.zevoirtechnologies.com:8443/pragna_dev/zTree_JS/jquery.ztree.excheck.js"></script>
+    <script type="text/javascript" src="https://dev.zevoirtechnologies.com:8443/pragna_dev/zTree_JS/jquery.ztree.exedit.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+    <SCRIPT type="text/javascript">
+
+	var zTree;
+    var demoIframe;
+    
+  	var url = "/pragna_dev";
+	//var url = "/pragna_qa";
+	//var url = "";
+
+    var setting = {
+      view: {
+        dblClickExpand: false,
+        showLine: true,
+        selectedMulti: false,
+		addHoverDom: addHoverDom,
+        removeHoverDom: removeHoverDom,
+        selectedMulti: false
+      },
+      data: {
+        simpleData: {
+          enable: true,
+          idKey: "id",
+          pIdKey: "pId",
+          rootPId: ""
+        }
+      },
+	  edit: {
+         enable: true
+       },
+      callback: {
+	    beforeClick: function (treeId, treeNode) {
+          var zTree = $.fn.zTree.getZTreeObj("tree");
+          if (treeNode.isParent) {
+            zTree.expandNode(treeNode);
+            return false;
+          } else {
+            demoIframe.attr("src", url+treeNode.file);
+            return true;
+          }
+        },
+		beforeDrag: beforeDrag,
+		beforeDrop: beforeDrop
+      }
+    };
+
+        var zNodes = $.parseJSON($.ajax({
+	      	  type : "GET",
+	      	  url : url+"/book/get_all_books_with_pages",
+	      	  dataType : "json",
+	      	 async: false
+	      	 
+	      }).responseText);
+        
+        console.log(zNodes);
+		
+		zNodes.sort(function (a, b) {
+    if (a.pId === b.pId) {
+        return a.id - b.id;
+    }
+    return a.pId - b.pId;
+});
+
+        $(document).ready(function(){
+            $.fn.zTree.init($("#tree"), setting, zNodes);
+			 var t = $("#tree");
+      t = $.fn.zTree.init(t, setting, zNodes);
+      demoIframe = $("#testIframe");
+      demoIframe.bind("load", loadReady);
+      var zTree = $.fn.zTree.getZTreeObj("tree");
+      setCheck();
+			$("#copy").bind("change", setCheck);
+			$("#move").bind("change", setCheck);
+			$("#prev").bind("change", setCheck);
+			$("#inner").bind("change", setCheck);
+			$("#next").bind("change", setCheck);
+        });
+		
+		function loadReady() {
+      var bodyH = demoIframe.contents().find("body").get(0).scrollHeight,
+        htmlH = demoIframe.contents().find("html").get(0).scrollHeight,
+        maxH = Math.max(bodyH, htmlH), minH = Math.min(bodyH, htmlH),
+        h = demoIframe.height() >= maxH ? minH : maxH;
+      if (h < 700) h = 700;
+      demoIframe.height(h);
+    }
+
+        var count = 1;
+		
+        function addHoverDom(treeId, treeNode) {
+            var sObj = $("#" + treeNode.tId + "_span");
+            if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
+            var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+                + "' title='add node' onfocus='this.blur();'></span>";
+            sObj.after(addStr);
+            var btn = $("#addBtn_"+treeNode.tId);
+            if (btn) btn.bind("click", function(){
+                var zTree = $.fn.zTree.getZTreeObj("tree");
+                var newCount=count++;
+                var maxid=$.parseJSON($.ajax({
+        	      	  type : "GET",
+        	      	  url : url+"/book/get_max_page_id",
+        	      	  dataType : "json",
+        	      	 async: false
+        	      	 
+        	      }).responseText);
+                if(maxid >=1)
+                	{
+                	var newNodeData = {
+                        	id: maxid + newCount,
+                            pId: treeNode.id,
+                            name: "new node" + newCount
+                        };
+                	}
+                else{
+                	var newNodeData = {
+                        	id: 100 + newCount,
+                            pId: treeNode.id,
+                            name: "new node" + newCount
+                        };
+                }
+                zTree.addNodes(treeNode, newNodeData);
+                addNodeAjax(newNodeData);
+                return false;
+            });
+        };
+
+        function removeHoverDom(treeId, treeNode) {
+            $("#addBtn_"+treeNode.tId).unbind().remove();
+			
+        };
+		
+function beforeDrag(treeId, treeNodes) {
+			for (var i=0,l=treeNodes.length; i<l; i++) {
+				if (treeNodes[i].drag === false) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+function beforeDrop(treeId, treeNodes, targetNode, moveType) {
+		if (targetNode) {
+        if (targetNode.drop !== false) {
+            var sourceNodeId = treeNodes[0];
+            var targetNodeId = targetNode;
+			console.log(sourceNodeId.id);
+			console.log(targetNodeId.id);
+			console.log(moveType);
+			$.ajax({
+                type: "POST",
+                url: url+"/book/update_book",
+                data: {
+                    "source_id": sourceNodeId.id,
+                    "target_id": targetNodeId.id,
+                    "move": moveType
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // If the backend updates the tree successfully, return true
+                        return true;
+                    } else {
+                        // If the backend fails to update the tree, return false
+                        return false;
+                    }
+                },
+                error: function () {
+                    // If an error occurs during the AJAX call, return false
+                    return false;
+                }
+            });
+			}
+		}
+			return targetNode ? targetNode.drop !== false : true;
+		}
+		
+function setCheck() {
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+			isCopy = $("#copy").attr("checked"),
+			isMove = $("#move").attr("checked"),
+			prev = $("#prev").attr("checked"),
+			inner = $("#inner").attr("checked"),
+			next = $("#next").attr("checked");
+			zTree.setting.edit.drag.isCopy = isCopy;
+			zTree.setting.edit.drag.isMove = isMove;
+			showCode(1, ['setting.edit.drag.isCopy = ' + isCopy, 'setting.edit.drag.isMove = ' + isMove]);
+
+			zTree.setting.edit.drag.prev = prev;
+			zTree.setting.edit.drag.inner = inner;
+			zTree.setting.edit.drag.next = next;
+			showCode(2, ['setting.edit.drag.prev = ' + prev, 'setting.edit.drag.inner = ' + inner, 'setting.edit.drag.next = ' + next]);
+		}
+
+function showCode(id, str) {
+			var code = $("#code" + id);
+			code.empty();
+			for (var i=0, l=str.length; i<l; i++) {
+				code.append("<li>"+str[i]+"</li>");
+			}
+		}
+		
+		
+function addNodeAjax(treeNode) {
+console.log(treeNode);
+    // Make an AJAX call to add a new node
+    $.ajax({
+        type: "POST",
+        url: url+"/book/add_new_page",
+        data: {
+            "id": treeNode.id,
+            "pId": treeNode.pId,
+            "name": treeNode.name,
+        },
+        success: function (response) {
+        	console.log(response);
+            if (response >= 1) {
+                var zTree = $.fn.zTree.getZTreeObj("tree");
+                var newNode = {
+                	    id: treeNode.id,
+                	    pId: treeNode.pId,
+                	    name: treeNode.name,
+                	    file: "/adminPageRoting/" + treeNode.id
+                	};
+                zTree.addNodes(treeNode, newNode);
+                window.location.reload();
+            } else {
+                alert("Failed to add node.");
+            }
+        },
+        error: function () {
+            alert("Error adding node.");
+        }
+    });
+}
+
+
+function editNodeAjax(treeNode, newName) {
+console.log(treeNode);
+console.log(newName);
+    // Make an AJAX call to edit the node
+    $.ajax({
+        type: "POST",
+        url: url+"/book/update_page",
+        data: {
+            id: treeNode.id,
+            name: newName
+        },
+        success: function (response) {
+            if (response >= 1) {
+                treeNode.name = newName;
+                var zTree = $.fn.zTree.getZTreeObj("tree");
+                zTree.updateNode(treeNode);
+            } else {
+                alert("Failed to edit node.");
+            }
+        },
+        error: function () {
+            alert("Error editing node.");
+        }
+    });
+}
+
+
+function deleteNodeAjax(treeNode) {
+console.log(treeNode);
+    // Make an AJAX call to delete the node
+    $.ajax({
+        type: "POST",
+        url: url+"/book/delete_page",
+        data: {
+            id: treeNode.id
+        },
+        success: function (response) {
+            if (response>=1) {
+                var zTree = $.fn.zTree.getZTreeObj("tree");
+                zTree.removeNode(treeNode);
+            } else {
+                alert("Failed to delete node.");
+            }
+        },
+        error: function () {
+            alert("Error deleting node.");
+        }
+    });
+}
+
+function submitBook()
+{
+	var formData = new FormData();
+	   formData.append("name", $("#book").val());
+	   
+	   var xhr = new XMLHttpRequest();
+	   xhr.open("POST", url+"/book/add_new_book");
+	   xhr.send(formData);
+	   xhr.addEventListener("readystatechange", function () {
+	   	  if (this.readyState === 4) {
+	   		  alert("Book Added");
+	   	  }
+	   	}); 
+}	
+		
+    </SCRIPT>
+</HEAD>
+
+<BODY>
+<TABLE border=0 height=100% align=left FRAMEBORDER=0 SCROLLING=AUTO>
+  <TR>
+    <TD width=260px align=left valign=top style="background: darkslategray;BORDER-RIGHT: #999999 1px dashed" height=100%>
+    <button type="button" data-toggle="modal"
+					data-target="#questionModal" style="float: right;">
+					Add Book
+				</button>
+	<div class="modal fade" id="questionModal" tabindex="-1"
+					role="dialog" aria-labelledby="questionModalLabel"
+					aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="questionModalLabel">Ask a
+									New Book</h5>
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form id="question-form">
+									<div class="form-group">
+										<label for="question">Book Name:</label> <input type="text"
+											class="form-control" id="book"
+											placeholder="Enter your Book Name" required>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary"
+									data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary"
+									onclick="submitBook()">
+									Submit
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+     <ul id="tree" class="ztree" style="width:260px; overflow:auto;"></ul>
+     
+    </TD>
+    <TD width=100% align=left valign=top height=100%>
+      <IFRAME ID="testIframe" Name="testIframe" FRAMEBORDER=0 SCROLLING=AUTO width=100% height=100%
+              SRC="https://dev.zevoirtechnologies.com:8443/pragna_dev/adminPageRoting/main"></IFRAME>
+    </TD>
+  </TR>
+</TABLE>
+
+ 
+</BODY>
+</HTML>

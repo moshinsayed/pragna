@@ -7,8 +7,8 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<link rel="stylesheet" href="/sample.css" />
-<link rel="stylesheet" href="/manage-audio.css">
+<link rel="stylesheet" href="https://dev.zevoirtechnologies.com:8443/pragna_dev/sample.css" />
+<link rel="stylesheet" href="https://dev.zevoirtechnologies.com:8443/pragna_dev/manage-audio.css">
 <script
 	src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js"></script>
 <link rel="stylesheet"
@@ -17,9 +17,9 @@
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
-<link href="/rateit.css" rel="stylesheet" type="text/css">
-<script src="/jquery.rateit.js"></script>
-<title>Text to Speech</title>
+<link href="https://dev.zevoirtechnologies.com:8443/pragna_dev/rateit.css" rel="stylesheet" type="text/css">
+<script src="https://dev.zevoirtechnologies.com:8443/pragna_dev/jquery.rateit.js"></script>
+<title>Pragna Kids</title>
 <style>
 .rateit .rateit-selected {
 	color: rgb(239, 197, 41) !important;
@@ -44,8 +44,14 @@
 			<p class="label text-light mt-4">Select Voice</p>
 
 			<select id="voiceSelect" class="form-select bg-secondary text-light">
-				<option value="">Select a Voice</option>
-				<option value="Joanna">Joanna</option>
+				<option value="Joanna">Joanna, Female</option>
+				<option value="Kimberly">Kimberly, Female</option>
+				<option value="Kendra">Kendra, Female</option>
+				<option value="Ivy">Ivy, Female</option>
+				<option value="Matthew">Matthew, Male</option>
+				<option value="Justin">Justin, Male</option>
+				<option value="Joey">Joey, Male</option>
+				<option value="Salli">Salli, Female</option>
 			</select>
 
 			<!-- Range Slliders for Volume, Rate & Pitch -->
@@ -145,72 +151,106 @@
 		</div>
 	</div>
 </body>
-
-<script src="/sample.js"></script>
-<script src="/recorder.js"></script>
-<script src="/app.js"></script>
+<script src="https://dev.zevoirtechnologies.com:8443/pragna_dev/recorder.js"></script>
+<script src="https://dev.zevoirtechnologies.com:8443/pragna_dev/app.js"></script>
 <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1437.0.min.js"></script>
 
 <script>
 
 
 
-var url = window.location.href;
-var path = new URL(url).pathname;
+var url = "/pragna_dev";
+//var url = "/pragna_qa";
+//var url = "";
+
+
+var path = new URL(window.location.href).pathname;
 var id=path.split("/")[2];
+if(isNaN(id)){
+	id=path.split("/")[3];
+}
+
 var previous_id="";
 var next_id="";
+
 document.addEventListener('DOMContentLoaded', function()  {
 	
 	var formData = new FormData();
-	   formData.append("pageId", id);
-	   
-	   var xhr = new XMLHttpRequest();
-	   xhr.open("POST", "/page/getPageById");
-	   xhr.send(formData);
-	   xhr.addEventListener("readystatechange", function () {
-	   	  if (this.readyState === 4) {
-	   		 console.log(this.responseText);
-	   		var response = JSON.parse(this.responseText);
-	   		var pageId = response.pageId;
-	   		console.log(pageId);
-	   		document.getElementById("text_id").innerHTML=response.text;
-	   		document.getElementById("image_id").src=response.imageUrl;
-	   	  }
-	   	});
-	   
-	   var xhr1 = new XMLHttpRequest();
-	   xhr1.open("POST", "/page/getPreviousNextIds");
-	   xhr1.send(formData);
-	   xhr1.addEventListener("readystatechange", function () {
-	   	  if (this.readyState === 4) {
-	   		 console.log(this.responseText);
-	   		var response = JSON.parse(this.responseText);
-	   		previous_id = response.previuos;
-	   		next_id = response.next;
-	   		
-	   		if(response.previuos == null)
-			{
-	   			const button1 = document.getElementById('previousId');
-	   			 button1.disabled = true;
-			}
-	   		if(response.next == null)
-			{
-	   			const button2 = document.getElementById('nextId');
-	   			 button2.disabled = true;
-			}
-	   		}
-	   	});
-	   
-	  
+	formData.append("pageId", id);
 
+	$.ajax({
+	  type: "POST",
+	  url: url+"/page/getPageById",
+	  data: formData,
+	  processData: false,
+	  contentType: false,
+	  success: function(response) {
+	    console.log(response);
+	    var pageId = response.pageId;
+	    console.log(pageId);
+	    $("#text_id").html(response.text);
+	    $("#image_id").attr("src", response.imageUrl);
+	  },
+	  error: function(xhr, status, error) {
+	    console.error("Error:", error);
+	  }
+	});
+	
+	
+	$.ajax({
+		  type: "POST",
+		  url: url+"/page/getPageById",
+		  data: formData,
+		  processData: false,
+		  contentType: false,
+		  success: function(response) {
+		    console.log(response);
+		    var pageId = response.pageId;
+		    console.log(pageId);
+		    $("#text_id").html(response.text);
+		    $("#image_id").attr("src", response.imageUrl);
+		  },
+		  error: function(xhr, status, error) {
+		    console.error("Error:", error);
+		  }
+		});
+
+	/* if(id=='103'){
+		var url4 = "https://testtesttest.zevoirtechnologies.com:8443/pragna_dev";	
+	} else {
+		var url4 = "https://server.zevoirtechnologies.com:8443/pragna_dev";
+	} */
+
+	$.ajax({
+		  type: "POST",
+		  url: url+"/page/getPreviousNextIds",
+		  data: formData,
+		  processData: false,
+		  contentType: false,
+		  success: function(response) {
+		    console.log(response);
+		     previous_id = response.previuos;
+		     next_id = response.next;
+
+		    if (previous_id == null) {
+		      $('#previousId').prop('disabled', true);
+		    }
+
+		    if (next_id == null) {
+		      $('#nextId').prop('disabled', true);
+		    }
+		  },
+		  error: function(xhr, status, error) {
+		    console.error("Error:", error);
+		  }
+		});
 })
 
 function previous()
 {
 	if(previous_id>0)
 		{
-	window.open("/page/"+previous_id, "_self");
+	window.open(url+"/page/"+previous_id, "_self");
 		}
 		else{
 			Swal.fire({
@@ -223,7 +263,7 @@ function next()
 {
 			if(next_id>0)
 	   			{
-	   			window.open("/page/"+next_id, "_self");
+	   			window.open(url+"/page/"+next_id, "_self");
 	   			}
 	   		else{
 	   			Swal.fire({
@@ -277,26 +317,67 @@ document.querySelector("#start").addEventListener("click", () => {
     	  document.getElementById("resume").style.display = "none";
     	  document.getElementById("start").style.display = "inline-block";
         });
+      let text = document.getElementById("text_id");
+      let originalText = text.innerText;
+      audioElement.addEventListener("timeupdate", (event) => {
+    	  const currentTime = audioElement.currentTime;
+    	  const spokenWords = calculateSpokenWords(originalText);
+  
+    	  let currentWord = null;
+          for (let i = 0; i < spokenWords.length; i++) {
+            if (currentTime >= spokenWords[i].startTime && currentTime <= spokenWords[i].endTime) {
+              currentWord = spokenWords[i].word;
+              const charIndex = originalText.indexOf(currentWord);
+              const charLength = currentWord.length;
+              text.innerHTML = highlight(originalText, charIndex, charIndex + charLength);
+              break;
+            }
+          }
+          
+          
+        });
     }
   });
   
-  
-/*  let text = document.getElementById("text_id");
-  let originalText = text.innerText;
-  speech.text=originalText;
-  speech.addEventListener("boundary", (event) => {
-      const { charIndex, charLength } = event;
-      console.log(charIndex+'---'+charLength);
-      text.innerHTML  = highlight(
-		originalText,
-        charIndex,
-        charIndex + charLength
-      );
-    });*/
   document.getElementById("start").style.display = "none";
   document.getElementById("pause").style.display = "inline-block";
 });
 
+function calculateSpokenWords(text) {
+	  // Split the text into words
+	  const words = text.split(/\s+/);
+
+	  const spokenWords = [];
+	  let startTime = 0;
+	  for (const word of words) {
+	    const endTime = startTime + calculateWordDuration(word); // You need to implement calculateWordDuration
+	    spokenWords.push({ word, startTime, endTime });
+	    startTime = endTime;
+	  }
+
+	  return spokenWords;
+	}
+
+function calculateWordDuration(word) {
+	  // Replace 'yourVoice' with the actual voice you're using (e.g., 'Joanna')
+	  const averageWordsPerMinute = getAverageWordsPerMinute('Joanna');
+	  
+	  // Calculate duration in seconds
+	  const secondsPerWord = 60 / averageWordsPerMinute;
+	  return secondsPerWord;
+	}
+
+	// This is a simple example, you should replace this with actual data
+	function getAverageWordsPerMinute(voice) {
+	  const voiceSpeeds = {
+	    Joanna: 180, // Example value, adjust as needed
+	    AnotherVoice: 200 // Example value for another voice
+	    // Add more voices and corresponding speeds as needed
+	  };
+	  
+	  return voiceSpeeds[voice] || 180; // Default to 180 if voice not found
+	}
+	
 document.querySelector("#pause").addEventListener("click", () => {
   audioElement.pause();
   document.getElementById("pause").style.display = "none";

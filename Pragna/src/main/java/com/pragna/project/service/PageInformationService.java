@@ -12,7 +12,7 @@ import com.pragna.project.model.PageModel;
 @Service
 public interface PageInformationService {
 
-	Long addPageInformation(MultipartFile file, String pageName, String sourceReference, String imageUrl, String text, String source) throws IOException;
+	Long addPageInformation(MultipartFile file, Long id, String sourceReference, String text, String source) throws IOException;
 
 	PageModel getPageById(Long id);
 

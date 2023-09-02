@@ -148,23 +148,24 @@ function createDownloadLink(blob) {
 	au.addEventListener("canplaythrough", () => {
 		au.play();
 		
-		au.addEventListener("timeupdate", (event) => {
-			const currentTime = au.currentTime;
-    		const duration = au.duration;
-    
-    // Calculate the character index and length based on audio's current time and text's length
-    		const progressPercentage = (currentTime / duration) * 100;
-    		const textLength = originalText.length;
-    		const charIndex = Math.floor((progressPercentage / 100) * textLength);
-    		 const remainingText = originalText.substring(charIndex);
-    		 console.log(remainingText.length);
-    		const charLength = 10;
-		      text.innerHTML  = highlight1(
-		        originalText,
-		        charIndex,
-		        charIndex + charLength
-		      );
-    });
+		 au.addEventListener("timeupdate", (event) => {
+    	  const currentTime = au.currentTime;
+    	  const spokenWords = calculateSpokenWords(originalText);
+  
+    	  let currentWord = null;
+          for (let i = 0; i < spokenWords.length; i++) {
+            if (currentTime >= spokenWords[i].startTime && currentTime <= spokenWords[i].endTime) {
+              currentWord = spokenWords[i].word;
+              break;
+            }
+          }
+          
+          if (currentWord) {
+            const charIndex = originalText.indexOf(currentWord);
+            const charLength = currentWord.length;
+            text.innerHTML = highlight(originalText, charIndex, charIndex + charLength);
+          }
+        });
 	});
 	//save to disk link
 	link.href = url;
@@ -311,7 +312,8 @@ var fluencyRhythmData = [overall, fluency, pronunciation ];
 		 // alert($("#text_id").val());
 		  fd.append("text", $("#text_id").text());
 		  fd.append("file",blob, filename);
-		  xhr.open("POST", "/record/submit_audio");
+		 // xhr.open("POST", url+"/record/submit_audio");
+		  xhr.open("POST", "https://dev.zevoirtechnologies.com:8443/pragna_dev/record/submit_audio");
 		  xhr.send(fd);
 	})
 	button.textContent = 'Upload';

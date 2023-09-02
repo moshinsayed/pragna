@@ -11,14 +11,17 @@
 	</parent>
 	<groupId>com.pragna</groupId>
 	<artifactId>Pragna</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>pragna</name>
 	<description>Pragna app for kids</description>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
 	<dependencies>
+	<!-- <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>

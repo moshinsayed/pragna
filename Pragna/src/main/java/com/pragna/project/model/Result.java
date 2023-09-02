@@ -1,9 +1,12 @@
 package com.pragna.project.model; 
 import java.util.ArrayList;
 
-import lombok.Data; 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Result{
     public int pronunciation;
     public ArrayList<Word> words;
