@@ -17,71 +17,62 @@ import com.pragna.project.model.PageModel;
 import com.pragna.project.service.PageInformationService;
 
 @Component
-public class PageInformationServiceImpl implements PageInformationService{
+public class PageInformationServiceImpl implements PageInformationService {
 
 	@Autowired
 	PageRepository pageRepo;
 
 	@Override
-	public Long addPageInformation(MultipartFile file, String pageName, String sourceReference, String imageUrl, String text, String source) throws IOException {
-			
-			 Page data=new Page();
-			 if(imageUrl.isEmpty())
-	         {
-				 String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-				 data.setFileName(fileName);
-		         data.setFileType(file.getContentType());
-		         data.setImage(file.getBytes());
-	         }
-	         
-			 data.setImageUrl(imageUrl);
-			 data.setPageName(pageName);
-			 data.setSource(source);
-			 data.setSourceReference(sourceReference);
-			 data.setText(text);
-			 
-	         Page saved_data=pageRepo.save(data);
-	         Optional<Page> dbFile1 = pageRepo.findById(saved_data.getId());
-				String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/page/imageURL/")
-						.path(dbFile1.get().getId().toString()).toUriString();
-				
-			PageModel output=new PageModel();
-			output.setPageId(saved_data.getId());
-			output.setPageName(saved_data.getPageName());
-			output.setText(saved_data.getText());
-			if(imageUrl.isEmpty())
-			{
-				output.setImageUrl(fileDownloadUri);
+	public Long addPageInformation(MultipartFile file, Long id, String sourceReference, String text, String source) throws IOException {
+
+		Page data = null;
+		if(pageRepo.findById(id).isPresent())
+		{
+			data=pageRepo.findById(id).get();
+		}
+		else {
+			data=new Page();
 			}
-			else {
-				output.setImageUrl(imageUrl);
-			}
-			return saved_data.getId();
+		if(file != null)
+		{
+			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+			data.setFileName(fileName);
+			data.setFileType(file.getContentType());
+			data.setImage(file.getBytes());
+		}
+
+		data.setSource(source);
+		data.setSourceReference(sourceReference);
+		data.setText(text);
+
+		Page saved_data = pageRepo.save(data);
+		Optional<Page> dbFile1 = pageRepo.findById(saved_data.getId());
+		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/page/imageURL/")
+				.path(dbFile1.get().getId().toString()).toUriString();
+
+		PageModel output = new PageModel();
+		output.setPageId(saved_data.getId());
+		output.setPageName(saved_data.getName());
+		output.setText(saved_data.getText());
+		output.setImageUrl(fileDownloadUri);
+		return saved_data.getId();
 	}
 
 	@Override
 	public PageModel getPageById(Long id) {
-		PageModel output=new PageModel();
-		Optional<Page> data=pageRepo.findById(id);
-		if(data.isPresent()) {
-		Page saved_data=data.get();
-		Optional<Page> dbFile1 = pageRepo.findById(saved_data.getId());
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/page/imageURL/")
-				.path(dbFile1.get().getId().toString()).toUriString();
-	
-		output.setPageId(saved_data.getId());
-		output.setPageName(saved_data.getPageName());
-		output.setText(saved_data.getText());
-		if(saved_data.getImageUrl().isEmpty())
-		{
-			output.setImageUrl(fileDownloadUri);
-		}
-		else {
-			output.setImageUrl(saved_data.getImageUrl());
-		}
-		}
-		else
-		{
+		PageModel output = new PageModel();
+		Optional<Page> data = pageRepo.findById(id);
+		if (data.isPresent()) {
+			Page saved_data = data.get();
+			Optional<Page> dbFile1 = pageRepo.findById(saved_data.getId());
+			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/page/imageURL/")
+					.path(dbFile1.get().getId().toString()).toUriString();
+
+			output.setPageId(saved_data.getId());
+			output.setPageName(saved_data.getName());
+			output.setText(saved_data.getText());
+				output.setImageUrl(fileDownloadUri);
+			} else {
 			output.setPageId(0L);
 		}
 		return output;
@@ -95,44 +86,43 @@ public class PageInformationServiceImpl implements PageInformationService{
 	@Override
 	public Long getPreviousEntity(Long id) {
 		Sort.Order orderById = Sort.Order.asc("id");
-        Sort sort = Sort.by(orderById);
-        List<Page> entities = pageRepo.findAll(sort);
+		Sort sort = Sort.by(orderById);
+		List<Page> entities = pageRepo.findAll(sort);
 
-        int index = -1;
-        for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i).getId().equals(id)) {
-                index = i;
-                break;
-            }
-        }
+		int index = -1;
+		for (int i = 0; i < entities.size(); i++) {
+			if (entities.get(i).getId().equals(id)) {
+				index = i;
+				break;
+			}
+		}
 
-        if (index > 0) {
-            return entities.get(index - 1).getId();
-        } else {
-            return null; // no previous entity
-        }
+		if (index > 0) {
+			return entities.get(index - 1).getId();
+		} else {
+			return null; // no previous entity
+		}
 	}
 
 	@Override
 	public Long getNextEntity(Long id) {
 		Sort.Order orderById = Sort.Order.asc("id");
-        Sort sort = Sort.by(orderById);
-        List<Page> entities = pageRepo.findAll(sort);
+		Sort sort = Sort.by(orderById);
+		List<Page> entities = pageRepo.findAll(sort);
 
-        int index = -1;
-        for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i).getId().equals(id)) {
-                index = i;
-                break;
-            }
-        }
+		int index = -1;
+		for (int i = 0; i < entities.size(); i++) {
+			if (entities.get(i).getId().equals(id)) {
+				index = i;
+				break;
+			}
+		}
 
-        if (index < entities.size() - 1) {
-            return entities.get(index + 1).getId();
-        } else {
-            return null; // no next entity
-        }
+		if (index < entities.size() - 1) {
+			return entities.get(index + 1).getId();
+		} else {
+			return null; // no next entity
+		}
 	}
-	
-	
+
 }

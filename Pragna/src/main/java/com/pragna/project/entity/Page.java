@@ -16,7 +16,6 @@ import lombok.Data;
 @Entity
 @Table(name="tbl_page")
 @Data
-@SequenceGenerator(name = "custom_sequence", sequenceName = "custom_seq", allocationSize = 1)
 public class Page implements Serializable {
 
 	/**
@@ -25,15 +24,14 @@ public class Page implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "custom_sequence")
 	private Long id;
+	
+	private Long pId;
 	
 	@Column(length = 1000)
 	private String text;
 	
-	private String imageUrl;
-	
-	private String pageName;
+	private String name;
 	
 	private String sourceReference;
 	

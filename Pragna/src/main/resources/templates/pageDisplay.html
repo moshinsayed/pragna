@@ -1,193 +1,256 @@
 <html lang="en">
-  <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link rel="stylesheet" href="/sample.css" />
-    <link rel="stylesheet" href="/manage-audio.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js"></script>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.min.css"> 
-   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<head>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="https://dev.zevoirtechnologies.com:8443/pragna_dev/sample.css" />
+<link rel="stylesheet" href="https://dev.zevoirtechnologies.com:8443/pragna_dev/manage-audio.css">
+<script
+	src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    
-    <link href="/rateit.css" rel="stylesheet" type="text/css">
-	<script src="/jquery.rateit.js"></script>
-    <title>Text to Speech</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+<link href="https://dev.zevoirtechnologies.com:8443/pragna_dev/rateit.css" rel="stylesheet" type="text/css">
+<script src="https://dev.zevoirtechnologies.com:8443/pragna_dev/jquery.rateit.js"></script>
+<title>Pragna Kids</title>
 <style>
 .rateit .rateit-selected {
-color: rgb(239, 197, 41) !important;
+	color: rgb(239, 197, 41) !important;
 }
+
 .rateit.rateit-font .rateit-reset {
 	display: none !important;
 }
 </style>
-  </head>
-  <body class="container mt-5 bg-dark">
+</head>
+<body class="container mt-5 bg-dark">
 	<div class="row">
-	<div class="col-sm-6">
-    <image width="100%" height="500px" id="image_id"></image>
-	</div>
-	<div class="col-sm-6">
-	
-    <!-- Text Area  for the User to Type -->
-    <div class="form-control bg-dark text-light" style="height: 255px;" id="text_id"></div>
+		<div class="col-sm-6">
+			<image width="100%" height="500px" id="image_id"></image>
+		</div>
+		<div class="col-sm-6">
 
-    <p class="label text-light mt-4">Select Voice</p>
-    
-    <!-- Select Menu for Voice -->
-    <select id="voices" class="form-select bg-secondary text-light"></select>
+			<!-- Text Area  for the User to Type -->
+			<div class="form-control bg-dark text-light" style="height: 255px;"
+				id="text_id"></div>
 
-    <!-- Range Slliders for Volume, Rate & Pitch -->
-    <div class="d-flex mt-4 text-light">
-      <div class="mx-3">
-        <p class="label">Volume</p>
-        <input type="range" min="0" max="1" value="1" step="0.1" id="volume" />
-        <span id="volume-label" class="ms-2">1</span>
-      </div>
-      <div class="mx-3">
-        <p class="label">Rate</p>
-        <input type="range" min="0.1" max="10" value="1" id="rate" step="0.1" />
-        <span id="rate-label" class="ms-2">1</span>
-      </div>
-     
-	 <div class="mx-3"> 
-        <p class="label">Pitch</p>
-        <input type="range" min="0" max="2" value="1" step="0.1" id="pitch" />
-        <span id="pitch-label" class="ms-2">1</span>
-      </div>
-    </div>
-	
-    <!-- Control Buttons -->
-    <div class="mb-5">
-	  <button id="previousId" onclick="previous()" class="btn btn-primary mt-4"><i class="fas fa-chevron-left"></i></button>
-      <button id="start" class="btn btn-success hover-button mt-4" data-hover-text="Start"><i class="fas fa-play"></i></button>
-      <button id="pause" class="btn btn-warning hover-button mt-4" style="display: none;" data-hover-text="Pause"><i class="fas fa-pause"></i></button>
-      <button id="resume" class="btn btn-info hover-button mt-4" style="display: none;" data-hover-text="Resume"><i class="fas fa-play-circle"></i></button>
-      <!-- <button id="cancel" class="btn btn-danger hover-button mt-4 me-3" style="display: none;" data-hover-text="Stop"><i class="fas fa-stop"></i></button> -->
-	  <button id="recordButton" class="btn btn-danger hover-button mt-4 ms-3" data-hover-text="Start_Record"><i class="fas fa-microphone"></i></button>
-	  <button id="pauseButton" class="btn btn-danger hover-button mt-4 ms-3" style="display: none;"data-hover-text="Pause_Record"><i class="fas fa-pause"></i></button>
-	  <button id="stopButton" class="btn btn-danger hover-button mt-4 ms-3" style="display: none;" data-hover-text="Stop_Record"><i class="fas fa-stop"></i></button>
-	  <button id="nextId" onclick="next()" class="btn btn-primary mt-4" style="float: right;"><i class="fas fa-chevron-right"></i></button>
-    </div>
+			<p class="label text-light mt-4">Select Voice</p>
+
+			<select id="voiceSelect" class="form-select bg-secondary text-light">
+				<option value="Joanna">Joanna, Female</option>
+				<option value="Kimberly">Kimberly, Female</option>
+				<option value="Kendra">Kendra, Female</option>
+				<option value="Ivy">Ivy, Female</option>
+				<option value="Matthew">Matthew, Male</option>
+				<option value="Justin">Justin, Male</option>
+				<option value="Joey">Joey, Male</option>
+				<option value="Salli">Salli, Female</option>
+			</select>
+
+			<!-- Range Slliders for Volume, Rate & Pitch -->
+			<div class="d-flex mt-4 text-light">
+				<audio id="audio" controls style="display: none">
+					<source class="track" type="audio/mpeg">
+				</audio>
+			</div>
+
+			<!-- Control Buttons -->
+			<div class="mb-5">
+				<button id="previousId" onclick="previous()"
+					class="btn btn-primary mt-4">
+					<i class="fas fa-chevron-left"></i>
+				</button>
+				<button id="start" class="btn btn-success hover-button mt-4"
+					data-hover-text="Start">
+					<i class="fas fa-play"></i>
+				</button>
+				<button id="pause" class="btn btn-warning hover-button mt-4"
+					style="display: none;" data-hover-text="Pause">
+					<i class="fas fa-pause"></i>
+				</button>
+				<button id="resume" class="btn btn-info hover-button mt-4"
+					style="display: none;" data-hover-text="Resume">
+					<i class="fas fa-play-circle"></i>
+				</button>
+				<!-- <button id="cancel" class="btn btn-danger hover-button mt-4 me-3" style="display: none;" data-hover-text="Stop"><i class="fas fa-stop"></i></button> -->
+				<button id="recordButton"
+					class="btn btn-danger hover-button mt-4 ms-3"
+					data-hover-text="Start_Record">
+					<i class="fas fa-microphone"></i>
+				</button>
+				<button id="pauseButton"
+					class="btn btn-danger hover-button mt-4 ms-3"
+					style="display: none;" data-hover-text="Pause_Record">
+					<i class="fas fa-pause"></i>
+				</button>
+				<button id="stopButton"
+					class="btn btn-danger hover-button mt-4 ms-3"
+					style="display: none;" data-hover-text="Stop_Record">
+					<i class="fas fa-stop"></i>
+				</button>
+				<button id="nextId" onclick="next()" class="btn btn-primary mt-4"
+					style="float: right;">
+					<i class="fas fa-chevron-right"></i>
+				</button>
+			</div>
+		</div>
 	</div>
-	</div>
-	
+
 	<div class="playback">
-			<ol id="recordingsList"></ol>
+		<ol id="recordingsList"></ol>
 	</div>
-	
+
 	<div id="overlay">
-  <div class="cv-spinner">
-    <span class="spinner"></span>
-  </div>
-</div>	
+		<div class="cv-spinner">
+			<span class="spinner"></span>
+		</div>
+	</div>
 
 
-<div id="myModal" class="modal">
-  <div class="modal-content" style="margin: 2% auto;">
+	<div id="myModal" class="modal">
+		<div class="modal-content" style="margin: 2% auto;">
 
-    <span class="close">&times;</span>
-    
-    <div class="container mt-4">
-    <h1 style="margin-top:0px">Speech Analysis Report</h1>
-    <div class="row">
-      <div class="container mt-5">
-  <div class="row">
-    <div class="col-md-5">
-      <h2>Fluency and Rhythm</h2>
-      <canvas id="fluencyRhythmChart" width="400" height="200"></canvas>
-    </div>
-    <div class="col-md-7">
-      <h2>Word Pronunciation Scores</h2>
-      <canvas id="pronunciationChart" width="400" height="200"></canvas>
-    </div>
-    
-  </div>
-</div>
-    </div>
-    <div class="row mt-4">
-	<div class="row">
-	 <div class="col-md-2"></div>
-      <div class="col-md-8">
-        <h2>Word Pronunciation</h2>
-        <div id="wordCharts"></div>
-      </div>
-	  <div class="col-md-2"></div>
-	  </div>
-    </div>
-  </div>
-    
-  </div>
-</div>																								
-  </body>
-  
-<script src="/sample.js"></script>
-<script src="/recorder.js"></script>
-<script src="/app.js"></script>
+			<span class="close">&times;</span>
+
+			<div class="container mt-4">
+				<h1 style="margin-top: 0px">Speech Analysis Report</h1>
+				<div class="row">
+					<div class="container mt-5">
+						<div class="row">
+							<div class="col-md-5">
+								<h2>Fluency and Rhythm</h2>
+								<canvas id="fluencyRhythmChart" width="400" height="200"></canvas>
+							</div>
+							<div class="col-md-7">
+								<h2>Word Pronunciation Scores</h2>
+								<canvas id="pronunciationChart" width="400" height="200"></canvas>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<div class="row mt-4">
+					<div class="row">
+						<div class="col-md-2"></div>
+						<div class="col-md-8">
+							<h2>Word Pronunciation</h2>
+							<div id="wordCharts"></div>
+						</div>
+						<div class="col-md-2"></div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+<script src="https://dev.zevoirtechnologies.com:8443/pragna_dev/recorder.js"></script>
+<script src="https://dev.zevoirtechnologies.com:8443/pragna_dev/app.js"></script>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1437.0.min.js"></script>
 
 <script>
 
 
 
-var url = window.location.href;
-var path = new URL(url).pathname;
+var url = "/pragna_dev";
+//var url = "/pragna_qa";
+//var url = "";
+
+
+var path = new URL(window.location.href).pathname;
 var id=path.split("/")[2];
+if(isNaN(id)){
+	id=path.split("/")[3];
+}
+
 var previous_id="";
 var next_id="";
+
 document.addEventListener('DOMContentLoaded', function()  {
 	
 	var formData = new FormData();
-	   formData.append("pageId", id);
-	   
-	   var xhr = new XMLHttpRequest();
-	   xhr.open("POST", "/page/getPageById");
-	   xhr.send(formData);
-	   xhr.addEventListener("readystatechange", function () {
-	   	  if (this.readyState === 4) {
-	   		 console.log(this.responseText);
-	   		var response = JSON.parse(this.responseText);
-	   		var pageId = response.pageId;
-	   		console.log(pageId);
-	   		document.getElementById("text_id").innerHTML=response.text;
-	   		document.getElementById("image_id").src=response.imageUrl;
-	   	  }
-	   	});
-	   
-	   var xhr1 = new XMLHttpRequest();
-	   xhr1.open("POST", "/page/getPreviousNextIds");
-	   xhr1.send(formData);
-	   xhr1.addEventListener("readystatechange", function () {
-	   	  if (this.readyState === 4) {
-	   		 console.log(this.responseText);
-	   		var response = JSON.parse(this.responseText);
-	   		previous_id = response.previuos;
-	   		next_id = response.next;
-	   		
-	   		if(response.previuos == null)
-			{
-	   			const button1 = document.getElementById('previousId');
-	   			 button1.disabled = true;
-			}
-	   		if(response.next == null)
-			{
-	   			const button2 = document.getElementById('nextId');
-	   			 button2.disabled = true;
-			}
-	   		}
-	   	});
-	   
-	  
+	formData.append("pageId", id);
 
+	$.ajax({
+	  type: "POST",
+	  url: url+"/page/getPageById",
+	  data: formData,
+	  processData: false,
+	  contentType: false,
+	  success: function(response) {
+	    console.log(response);
+	    var pageId = response.pageId;
+	    console.log(pageId);
+	    $("#text_id").html(response.text);
+	    $("#image_id").attr("src", response.imageUrl);
+	  },
+	  error: function(xhr, status, error) {
+	    console.error("Error:", error);
+	  }
+	});
+	
+	
+	$.ajax({
+		  type: "POST",
+		  url: url+"/page/getPageById",
+		  data: formData,
+		  processData: false,
+		  contentType: false,
+		  success: function(response) {
+		    console.log(response);
+		    var pageId = response.pageId;
+		    console.log(pageId);
+		    $("#text_id").html(response.text);
+		    $("#image_id").attr("src", response.imageUrl);
+		  },
+		  error: function(xhr, status, error) {
+		    console.error("Error:", error);
+		  }
+		});
+
+	/* if(id=='103'){
+		var url4 = "https://testtesttest.zevoirtechnologies.com:8443/pragna_dev";	
+	} else {
+		var url4 = "https://server.zevoirtechnologies.com:8443/pragna_dev";
+	} */
+
+	$.ajax({
+		  type: "POST",
+		  url: url+"/page/getPreviousNextIds",
+		  data: formData,
+		  processData: false,
+		  contentType: false,
+		  success: function(response) {
+		    console.log(response);
+		     previous_id = response.previuos;
+		     next_id = response.next;
+
+		    if (previous_id == null) {
+		      $('#previousId').prop('disabled', true);
+		    }
+
+		    if (next_id == null) {
+		      $('#nextId').prop('disabled', true);
+		    }
+		  },
+		  error: function(xhr, status, error) {
+		    console.error("Error:", error);
+		  }
+		});
 })
 
 function previous()
 {
 	if(previous_id>0)
 		{
-	window.open("/page/"+previous_id, "_self");
+	window.open(url+"/page/"+previous_id, "_self");
 		}
 		else{
 			Swal.fire({
@@ -200,7 +263,7 @@ function next()
 {
 			if(next_id>0)
 	   			{
-	   			window.open("/page/"+next_id, "_self");
+	   			window.open(url+"/page/"+next_id, "_self");
 	   			}
 	   		else{
 	   			Swal.fire({
@@ -210,242 +273,129 @@ function next()
 	   		}
 }
 
-/* $(document).ready(function() {
-	  // Sample data (replace with your actual data)
-	  var jsonData = {
-	  "result": {
-	    "pronunciation": 70,
-	    "words": [
-	      {
-	        "word": "demo",
-	       "phonics": [
-	          {
-	            "overall": 70,
-	            "spell": "d",
-	            "phoneme": [
-	              "d"
-	            ]
-	          },
-	          {
-	            "overall": 58,
-	            "spell": "e",
-	            "phoneme": [
-	              "ɛ"
-	            ]
-	          },
-	          {
-	            "overall": 80,
-	            "spell": "m",
-	            "phoneme": [
-	              "m"
-	            ]
-	          },
-	          {
-	            "overall": 68,
-	            "spell": "o",
-	            "phoneme": [
-	              "o"
-	            ]
-	          }
-	        ],
-	        "scores": {
-	          "overall": 71,
-	          "pronunciation": 71,
-	          "prominence": 1
-	        }
-		  },
-	      {
-	        "word": "for",
-	        "phonics": [
-	          {
-	            "overall": 95,
-	            "spell": "f",
-	            "phoneme": [
-	              "f"
-	            ]
-	          },
-	          {
-	            "overall": 60,
-	            "spell": "o",
-	            "phoneme": [
-	              "ɔ"
-	            ]
-	          },
-	          {
-	            "overall": 66,
-	            "spell": "r",
-	            "phoneme": [
-	              "r"
-	            ]
-	          }
-	        ],
-	        "scores": {
-	          "overall": 75,
-	          "pronunciation": 75,
-	          "prominence": 0
-	        }
-		  },
-	      {
-	        "word": "testing",
-	         "phonics": [
-	          {
-	            "overall": 1,
-	            "spell": "t",
-	            "phoneme": [
-	              "t"
-	            ]
-	          },
-	          {
-	            "overall": 0,
-	            "spell": "e",
-	            "phoneme": [
-	              "ɛ"
-	            ]
-	          },
-	          {
-	            "overall": 17,
-	            "spell": "s",
-	            "phoneme": [
-	              "s"
-	            ]
-	          },
-	          {
-	            "overall": 100,
-	            "spell": "t",
-	            "phoneme": [
-	              "t"
-	            ]
-	          },
-	          {
-	            "overall": 100,
-	            "spell": "i",
-	            "phoneme": [
-	              "ɪ"
-	            ]
-	          },
-	          {
-	            "overall": 92,
-	            "spell": "ng",
-	            "phoneme": [
-	              "ŋ"
-	            ]
-	          }
-	        ],
-	        "scores": {
-	          "overall": 63,
-	          "pronunciation": 63,
-	          "prominence": 1
-	        }
-	      }
-	    ],
-	    "fluency": 99,
-	    "rhythm": 90,
-	    "rear_tone": "fall",
-	    "overall": 75,
-	    "resource_version": "3.4.9",
-	    "oov": "pargna",
-	    "speed": 109,
-	    "duration": "2.305",
-	    "integrity": 100,
-	    "pause_count": 0,
-	    "kernel_version": "5.9.1"
-	  }
-	}; // Your JSON data
 
-	 
-	 var pronunciationChartCtx = document.getElementById('pronunciationChart').getContext('2d');
-	  var fluencyRhythmChartCtx = document.getElementById('fluencyRhythmChart').getContext('2d');
-	  
-	  // Process jsonData and extract necessary data for charts
-	  
-	  // Example data for demonstration
-	  var words = jsonData.result.words;
-		var pronunciationScores = words.map(function(word) {
-		return word.scores.pronunciation;
-		});
-	  var fluency = jsonData.result.fluency;
-	var rhythm = jsonData.result.rhythm;
-	var overall = jsonData.result.overall;
+AWS.config.accessKeyId = 'AKIAQBQJG3UTLJV75SFH'; 
+AWS.config.secretAccessKey = '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';
+
+AWS.config.region = 'us-east-1';
+
+var polly = new AWS.Polly();
+
+var params = {};
+
+var audioElement = document.getElementById("audio");
+var audioSource = audioElement.querySelector("source");
+
+
+document.querySelector("#start").addEventListener("click", () => {
 	
-	var fluencyRhythmData = [overall, fluency, rhythm ];
+	var selectedVoiceId = document.getElementById("voiceSelect").value;
+	  if (!selectedVoiceId) {
+	    alert("Please select a voice.");
+	    return;
+	  }
 	  
-	  // Create charts
-	  new Chart(pronunciationChartCtx, {
-	    type: 'bar',
-	   data: {
-	      labels: jsonData.result.words.map(function(word) {
-	        return word.word;
-	      }),
-	      datasets: [{
-	        label: 'Pronunciation Score',
-	        data: pronunciationScores,
-	        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-	        borderColor: 'rgba(75, 192, 192, 1)',
-	        borderWidth: 1
-	      }]
-	    },
-	    options: {
-	      scales: {
-	        y: {
-	          beginAtZero: true,
-	          max: 100
-	        }
-	      }
-	    }
-	  });
-	  
-	  new Chart(fluencyRhythmChartCtx, {
-	    type: 'polarArea',
-	    data: {
-	      labels: ['Overall', 'Fluency', 'Rhythm'],
-	      datasets: [{
-	        data: fluencyRhythmData,
-	        backgroundColor: ['rgba(75, 192, 192, 0.5)', 'rgba(255, 99, 132, 0.5)', 'rgba(255, 100, 142, 0.5)']
-	      }]
-	    }
-	  });
-	  
-	  var words = jsonData.result.words;
+  params.OutputFormat = "mp3";
+  params.TextType = "text";
+  params.Text = document.getElementById("text_id").innerText;
+  params.VoiceId = selectedVoiceId;
+  
+  polly.synthesizeSpeech(params, function(err, data) {
+    if (err) {
+      console.log(err, err.stack);
+    } else {
+      var uInt8Array = new Uint8Array(data.AudioStream); 
+      var arrayBuffer = uInt8Array.buffer;
+      var blob = new Blob([arrayBuffer]);
+      var url = URL.createObjectURL(blob);
+      
+      audioSource.src = url;
+      audioElement.load(); // Load the audio source
+      audioElement.play();
+      audioElement.addEventListener("ended", function() {
+    	  document.getElementById("pause").style.display = "none";
+    	  document.getElementById("resume").style.display = "none";
+    	  document.getElementById("start").style.display = "inline-block";
+        });
+      let text = document.getElementById("text_id");
+      let originalText = text.innerText;
+      audioElement.addEventListener("timeupdate", (event) => {
+    	  const currentTime = audioElement.currentTime;
+    	  const spokenWords = calculateSpokenWords(originalText);
+  
+    	  let currentWord = null;
+          for (let i = 0; i < spokenWords.length; i++) {
+            if (currentTime >= spokenWords[i].startTime && currentTime <= spokenWords[i].endTime) {
+              currentWord = spokenWords[i].word;
+              const charIndex = originalText.indexOf(currentWord);
+              const charLength = currentWord.length;
+              text.innerHTML = highlight(originalText, charIndex, charIndex + charLength);
+              break;
+            }
+          }
+          
+          
+        });
+    }
+  });
+  
+  document.getElementById("start").style.display = "none";
+  document.getElementById("pause").style.display = "inline-block";
+});
 
-	  // Create Word Pronunciation Charts
-	  var wordChartsDiv = document.getElementById("wordCharts");
-	  jsonData.result.words.forEach(function(word) {
-	    var wordChartCanvas = document.createElement("canvas");
-	    wordChartCanvas.className = "my-4";
-		wordChartCanvas.setAttribute("width", "546"); // Set canvas width
-	    wordChartCanvas.setAttribute("height", "273"); // Set canvas height
-	    wordChartsDiv.appendChild(wordChartCanvas);
-	    
-		var phonemeLabels = word.phonics.map(function(phoneme) {
-	      return phoneme.spell;
-	    });
+function calculateSpokenWords(text) {
+	  // Split the text into words
+	  const words = text.split(/\s+/);
 
-	    var phonemeScores = word.phonics.map(function(phoneme) {
-	      return phoneme.overall;
-	    });
-	    
-		var wordChartCtx = wordChartCanvas.getContext("2d");
-	    var wordChart = new Chart(wordChartCtx, {
-	      type: 'bar',
-	      data: {
-	        labels: phonemeLabels,
-	        datasets: [{
-	          label: 'Phoneme Score',
-	          data: phonemeScores,
-	          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-	          borderColor: 'rgba(75, 192, 192, 1)',
-	          borderWidth: 1
-	        }]
-	      },
-	      options: {
-	        scales: {
-	          y: {
-	            beginAtZero: true
-	          }
-	        }
-	      }
-	    });
-	  });
-}); */
+	  const spokenWords = [];
+	  let startTime = 0;
+	  for (const word of words) {
+	    const endTime = startTime + calculateWordDuration(word); // You need to implement calculateWordDuration
+	    spokenWords.push({ word, startTime, endTime });
+	    startTime = endTime;
+	  }
+
+	  return spokenWords;
+	}
+
+function calculateWordDuration(word) {
+	  // Replace 'yourVoice' with the actual voice you're using (e.g., 'Joanna')
+	  const averageWordsPerMinute = getAverageWordsPerMinute('Joanna');
+	  
+	  // Calculate duration in seconds
+	  const secondsPerWord = 60 / averageWordsPerMinute;
+	  return secondsPerWord;
+	}
+
+	// This is a simple example, you should replace this with actual data
+	function getAverageWordsPerMinute(voice) {
+	  const voiceSpeeds = {
+	    Joanna: 180, // Example value, adjust as needed
+	    AnotherVoice: 200 // Example value for another voice
+	    // Add more voices and corresponding speeds as needed
+	  };
+	  
+	  return voiceSpeeds[voice] || 180; // Default to 180 if voice not found
+	}
+	
+document.querySelector("#pause").addEventListener("click", () => {
+  audioElement.pause();
+  document.getElementById("pause").style.display = "none";
+  document.getElementById("resume").style.display = "inline-block";
+});
+
+document.querySelector("#resume").addEventListener("click", () => {
+  audioElement.play();
+  document.getElementById("resume").style.display = "none";
+  document.getElementById("pause").style.display = "inline-block";
+});
+
+const highlight = (text, from, to) => {
+  let replacement = highlightBackground(text.slice(from, to));
+  return text.substring(0, from) + replacement + text.substring(to);
+};
+const highlightBackground = (sample) =>
+  `<span  style="background-color:blue;">${sample}</span>`;
+
 </script>
 </html>

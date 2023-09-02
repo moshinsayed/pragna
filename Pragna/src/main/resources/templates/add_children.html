@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!-- Coding By CodingNepal - codingnepalweb.com -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Popup Modal Box</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- Fontawesome CDN Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
+    <script
+	src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.min.css">
+	<style>
+	/* Google Fonts - Poppins */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+section {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background: #e3f2fd;
+}
+button {
+  font-size: 18px;
+  font-weight: 400;
+  color: #fff;
+  padding: 14px 22px;
+  border: none;
+  background: #4070f4;
+  border-radius: 6px;
+  cursor: pointer;
+}
+close-btn {
+      font-size: 10px;
+    color: white;
+}
+button:hover {
+  background-color: #265df2;
+}
+button.show-modal,
+.modal-box {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+   max-height: 100vh; 
+   overflow-y: auto;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+section.active .show-modal {
+  display: none;
+}
+.overlay {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+}
+section.active .overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 500px;
+  width: 100%;
+  padding: 30px 20px;
+  border-radius: 24px;
+  background-color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  transform: translate(-50%, -50%) scale(1.2);
+}
+section.active .modal-box {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+.modal-box i {
+  font-size: 70px;
+  color: #4070f4;
+}
+.modal-box h2 {
+  margin-top: 20px;
+  font-size: 25px;
+  font-weight: 500;
+  color: #333;
+}
+.modal-box h3 {
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+  text-align: center;
+}
+.modal-box .buttons {
+  margin-top: 25px;
+}
+.modal-box button {
+  font-size: 14px;
+  padding: 6px 12px;
+  margin: 0 10px;
+}
+.form-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .submit-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+		
+@media screen and (min-width: 768px) {
+            .modal-box {
+                width: 50%;
+                max-width: 70%;
+            }
+			
+			.studentForm {
+			width: 380px; 
+			margin-top: 25px; 
+			}
+        }
+
+      @media screen and (max-width: 480px) {
+            .modal-box {
+                width: 90%;
+                max-width: 90%;
+            }
+            .form-input {
+                width: 100%;
+            }
+        }
+	</style>
+  </head>
+  <body>
+    <section>
+      <button class="show-modal">Add Child</button>
+      <span class="overlay"></span>
+
+      <div class="modal-box">
+        <i class="fa-regular fa-circle-check"></i>
+        <h2>Children Information</h2>
+        <form id="studentForm" class="studentForm">
+            <label class="form-label" for="childName">Child Name:</label>
+            <input class="form-input" type="text" id="childName" name="childName"><br>
+            <label class="form-label" for="childAge">Child Age:</label>
+            <input class="form-input" type="date" id="childAge" name="childAge"><br>
+ <button class="submit-button" type="submit">Submit</button>
+          </form>
+        <div class="buttons">
+          <button class="close-btn" style=" background: red; padding: 5px 10px 5px 10px; "><i class="fa fa-xmark" style=" font-size: 10px; color: white; "></i>
+</button>
+          
+        </div>
+      </div>
+    </section>
+
+    <script>
+    
+    var path = new URL(window.location.href).pathname;
+
+	var url = "/pragna_dev";
+	//var url = "/pragna_qa";
+	var id=path.split("/")[3];
+	
+	
+	//var url = "";
+	//var id=path.split("/")[2];
+	
+      const section = document.querySelector("section"),
+        overlay = document.querySelector(".overlay"),
+        showBtn = document.querySelector(".show-modal"),
+        closeBtn = document.querySelector(".close-btn");
+
+      showBtn.addEventListener("click", () => section.classList.add("active"));
+
+      overlay.addEventListener("click", () =>
+        section.classList.remove("active")
+      );
+
+      closeBtn.addEventListener("click", () =>
+        section.classList.remove("active")
+      );
+      
+      studentForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const childName = document.getElementById("childName").value;
+        const childAge = document.getElementById("childAge").value;
+        
+        var formData = new FormData();
+		   formData.append("childName", childName);
+		   formData.append("childDob", childAge);
+		   formData.append("parentId", id);
+		  
+		   var xhr = new XMLHttpRequest();
+		   xhr.open("POST", url+"/child/addChild");
+		   xhr.send(formData);
+		   xhr.addEventListener("readystatechange", function () {
+		   	  if (this.readyState === 4) {
+		   		  console.log(this.responseText);
+		   		Swal.fire({
+			   		  title: 'Child Addedd Successfully',
+			   		  showClass: {
+			   		    popup: 'animate__animated animate__fadeInDown'
+			   		  },
+			   		  hideClass: {
+			   		    popup: 'animate__animated animate__fadeOutUp'
+			   		  },
+			   		  text: "Click below Start Exploring Pragna Kids",
+			   		  icon: 'success',
+			   		  showCancelButton: true,
+			   		  confirmButtonColor: '#3085d6',
+			   		  cancelButtonColor: '#d33',
+			   		  confirmButtonText: 'Explore Pragna'
+			   		}).then((result) => {
+			   		  if (result.isConfirmed) {
+			   			 console.log(this.responseText);
+			 	   		var response = JSON.parse(this.responseText);
+			 	   		window.open(url+"/page/101", "_self");
+			   		  }
+			   		})
+		   		
+            }
+        });
+        section.classList.remove("active")
+    });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,418 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Pragna Kids</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdn.materialdesignicons.com/3.3.92/css/materialdesignicons.min.css">
+<link href="https://dev.zevoirtechnologies.com:8443/pragna_dev/admin_css/tower-file-input.css" rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+<script
+	src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.all.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.3/dist/sweetalert2.min.css">
+<style>
+.mdi:before {
+	text-decoration: none;
+	/*Set the font size to be larger. Default size seems too small*/
+	font-size: 1.2em;
+	line-height: 0.75em;
+	vertical-align: -15%;
+}
+
+.highlight {
+	background: yellow;
+}
+
+pre code {
+	font-size: 0.9rem;
+}
+
+.btn {
+	padding: 0.275rem 0.55rem !important;
+	font-size: 0.9rem !important;
+	/* border-radius: 0.25rem; */
+}
+
+ #overlay{	
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  height:100%;
+  display: none;
+  background: rgba(0,0,0,0.6);
+}
+.cv-spinner {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+}
+.spinner {
+  width: 100px;
+  height: 100px;
+  border: 10px #ddd solid;
+  border-top: 10px #2e93e6 solid;
+  border-radius: 50%;
+  animation: sp-anime 0.8s infinite linear;
+}
+@keyframes sp-anime {
+  100% { 
+    transform: rotate(360deg); 
+  }
+}
+.is-hide{
+  display:none;
+}
+
+.info-icon {
+  font-size: 35px;
+  cursor: pointer;
+  display: contents;
+  color: white;
+}
+
+ #imageBox {
+ 	height: 255px;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  #imageDisplay {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+</style>
+</head>
+<body>
+	<nav class="navbar navbar-dark bg-dark mb-2">
+		<div class="container">
+			<span class="navbar-brand" id="pageName" style="margin-left: 400px;"></span>
+		</div>
+	</nav>
+
+	<main class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="tower-file">
+					<div id="imageBox">
+  						<img id="imageDisplay" src="#" alt="Displayed Image">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<textarea class="form-control" rows=10 id="text"></textarea>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="container mt-5">
+				<button class="btn btn-success"
+					style="float: right; margin-bottom: 8px;" onclick="submitData()">Submit</button>
+				<button type="button" class="btn btn-primary" data-toggle="modal"
+					data-target="#questionModal" style="float: right;">
+					<i class="fas fa-plus-circle mr-2"></i> Add Question
+				</button>
+				
+				
+				<!-- Modal -->
+				<div class="modal fade" id="questionModal" tabindex="-1"
+					role="dialog" aria-labelledby="questionModalLabel"
+					aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="questionModalLabel">Ask a
+									Question</h5>
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form id="question-form">
+									<div class="form-group">
+										<label for="question">Question:</label> <input type="text"
+											class="form-control" id="question"
+											placeholder="Enter your question" required>
+									</div>
+									<div class="form-group">
+										<label for="option1">Answer Options:</label> <input
+											type="text" class="form-control" id="option1"
+											placeholder="Option 1" required> <input type="text"
+											class="form-control" id="option2" placeholder="Option 2"
+											required> <input type="text" class="form-control"
+											id="option3" placeholder="Option 3" required>
+									</div>
+									<div class="form-group">
+										<label for="answer">Correct Answer:</label> <select
+											class="form-control" id="answer" required>
+											<option value="" disabled selected>Select an
+												option...</option>
+										</select>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary"
+									data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary"
+									onclick="submitQuestion()">
+									<i class="fas fa-check-circle mr-2"></i> Submit Question
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<table id="myTable" class="display">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Question</th>
+							<th>Options</th>
+							<th>Answer</th>
+							<th>Page ID</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+		</div>
+		<br />
+
+<div id="overlay">
+		<div class="cv-spinner">
+			<span class="spinner"></span>
+		</div>
+	</div>
+
+	</main>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+		crossorigin="anonymous"></script>
+
+	<script src="https://dev.zevoirtechnologies.com:8443/pragna_dev/admin_js/tower-file-input.js"></script>
+	<link rel="stylesheet"
+		href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+	<script
+		src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script>
+	
+	var url = "/pragna_dev";
+	//var url = "/pragna_qa";
+	//var url = "";
+	
+	var path = new URL(window.location.href).pathname;
+	var id=path.split("/")[2];
+	if(isNaN(id)){
+		id=path.split("/")[3];
+	}
+	
+	const imageBox = document.getElementById('imageBox');
+	  const imageDisplay = document.getElementById('imageDisplay');
+	  var fileInput = document.createElement('input');
+	  	fileInput.type = 'file';
+	    fileInput.accept = 'image/*';
+	    fileInput.id = 'myFileInput';
+	  var selectedFile;
+		$(document).ready(function() {
+			console.log("pagePath" + path);
+			if(id == "main")
+				{
+				$('#myTable').dataTable({
+				    searching: true,
+				    paging: true,
+				    ordering: true,
+				    sDom: 'lrtip',
+				    bLengthChange: false
+				});
+				}
+			else{
+				
+			$("#overlay").fadeIn();　
+			var formData = new FormData();
+			   formData.append("pageId", id);
+			   
+			   var xhr = new XMLHttpRequest();
+			   xhr.open("POST", url+"/page/getPageById");
+			   xhr.send(formData);
+			   xhr.addEventListener("readystatechange", function () {
+			   	  if (this.readyState === 4) {
+			   		 console.log(this.responseText);
+			   		var response = JSON.parse(this.responseText);
+			   		var pageId = response.pageId;
+			   		console.log(pageId);
+			   		document.getElementById("text").innerHTML=response.text;
+			   		document.getElementById("pageName").innerHTML=response.pageName;
+			   		var result= $.ajax({
+				      	  type : "POST",
+				      	  data :{"pageId": id},
+				      	  url : url+"/questions/findbyid",
+				      	  dataType : "json",
+				      	 async: false
+				      	 
+				      }).responseText;
+					   	
+					 bindtoDatatable(JSON.parse(result));
+		               
+					 $("#overlay").fadeOut();　   
+			   		//document.getElementById("image_id").src=response.imageUrl;
+			   		var imageUrl = response.imageUrl;
+			   		console.log(imageUrl);
+			   		
+			   		setTimeout(() => {
+			   	      imageDisplay.src = imageUrl;
+			   	    }, 1000);
+			   	 
+			   	  }
+			   	});
+			}
+			   
+			   imageBox.addEventListener('click', () => {
+				    fileInput.addEventListener('change', (event) => {
+				      selectedFile = event.target.files[0];
+				      if (selectedFile) {
+				        const imageUrl = URL.createObjectURL(selectedFile);
+				        imageDisplay.src = imageUrl;
+				        
+				      }
+				    });
+				    fileInput.click();
+				  });
+			
+			 $("#option1, #option2, #option3").on("input", function() {
+	                const option1 = $("#option1").val();
+	                const option2 = $("#option2").val();
+	                const option3 = $("#option3").val();
+	                
+	                // Populate the correct answer dropdown with available options
+	                $("#answer").empty().append(
+	                    $("<option>", { value: "", disabled: true, selected: true }).text("Select an option..."),
+	                    $("<option>", { value: option1 }).text(option1),
+	                    $("<option>", { value: option2 }).text(option2),
+	                    $("<option>", { value: option3 }).text(option3)
+	                );
+	            });
+     
+});
+		
+		
+		
+		function submitData()
+		{
+			
+			//var singleFileUploadInput = document.getElementById('myFileInput');
+			//var files = singleFileUploadInput.files;
+			if(selectedFile == 0)
+			{
+			Swal.fire(
+					  'Invalid Data!',
+					  'Please Select File',
+					  'warning'
+					)
+			return;
+			}
+			
+				  
+			var formData = new FormData();
+			   formData.append("id", id);
+			   formData.append("source", "");
+			   formData.append("sourceReference", "");
+			   formData.append("text", $("#text").val());
+			   formData.append("file", selectedFile);
+			   
+			   var xhr = new XMLHttpRequest();
+			   xhr.open("POST", url+"/page/add_new");
+			   xhr.send(formData);
+			   xhr.addEventListener("readystatechange", function () {
+			   	  if (this.readyState === 4) {
+			   		  
+			   		Swal.fire({
+			   		  title: 'Page Added',
+			   		  showClass: {
+			   		    popup: 'animate__animated animate__fadeInDown'
+			   		  },
+			   		  hideClass: {
+			   		    popup: 'animate__animated animate__fadeOutUp'
+			   		  },
+			   		  text: "if you want to see the page, click below",
+			   		  icon: 'success',
+			   		  showCancelButton: true,
+			   		  confirmButtonColor: '#3085d6',
+			   		  cancelButtonColor: '#d33',
+			   		  confirmButtonText: 'Yes, Want to see it!'
+			   		}).then((result) => {
+			   		  if (result.isConfirmed) {
+			   			 console.log(this.responseText);
+			 	   		var response = JSON.parse(this.responseText);
+			   		    window.open(url+"/page/"+response);
+			   		  }
+			   		})
+			   	  }
+			   	}); 
+		}
+		
+		function submitQuestion()
+		{
+			var question = $("#question").val();
+            var option1 = $("#option1").val();
+            var option2 = $("#option2").val();
+            var option3 = $("#option3").val();
+            var answer = $("#answer").val();
+
+            var formData = new FormData();
+			   formData.append("pageId", id);
+			   formData.append("question", question);
+			   formData.append("options", [option1, option2, option3]);
+			   formData.append("answer", answer);
+			  
+			   var xhr = new XMLHttpRequest();
+			   xhr.open("POST", url+"/questions/add");
+			   xhr.send(formData);
+			   xhr.addEventListener("readystatechange", function () {
+			   	  if (this.readyState === 4) {
+			   		  console.log(this.responseText);
+			   		window.location.reload();
+                }
+            });
+		}
+		
+		function bindtoDatatable(data) {
+			console.log(data);
+			var table = $('#myTable').dataTable({
+			    searching: true,
+			    paging: true,
+			    ordering: true,
+			    sDom: 'lrtip',
+			    bLengthChange: false,
+			    data: data,
+			    columns: [
+			        { data: "id" },
+			        { data: "question" },
+			        { data: "options" },
+			        { data: "answers" },
+			        { data: "pageId"}
+			    ]
+			});
+
+	    }
+    </script>
+</body>
+</html>
